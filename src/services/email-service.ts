@@ -1,5 +1,4 @@
 import nodemailer, { type Transporter } from 'nodemailer';
-import { Request, Response } from 'express';
 
 export default class EmailService {
 	contactEmail: string | undefined;
@@ -13,8 +12,8 @@ export default class EmailService {
 		}
 
 		this.transporter = nodemailer.createTransport({
-			host: process.env.SMTP_HOST,
-			port: process.env.SMTP_PORT ?? 465,
+			host: process.env.SMTP_HOST ?? '',
+			port: 465,
 			secure: false,
 			auth: {
 				user: process.env.SMTP_USER,
@@ -23,14 +22,20 @@ export default class EmailService {
 		});
 	}
 
-	async sendEmail(req: Request, res: Response) {
+	async sendEmail({
+		name,
+		subject,
+		email,
+		message,
+	}: {
+		name: string;
+		subject: string;
+		email: string;
+		message: string;
+	}) {
 		try {
-			const { name, subject, email, message } = req.body;
-
 			if (!name || !subject || !email || !message) {
-				return res
-					.status(400)
-					.json({ status: 'error', message: 'Missing required fields' });
+				throw Error('Missing required fields');
 			}
 
 			const mailOptions = {
@@ -41,17 +46,9 @@ export default class EmailService {
 				text: message,
 			};
 
-			const info = await this.transporter.sendMail(mailOptions);
-			console.log('Email sent:', info.response);
-			res
-				.status(200)
-				.json({ status: 'success', message: 'Email sent successfully' });
+			return this.transporter.sendMail(mailOptions);
 		} catch (error) {
-			console.error('Error sending email:', error);
-			res.status(500).json({
-				status: 'error',
-				message: 'Error sending email, please try again.',
-			});
+			throw Error('Error sending email: ' + error);
 		}
 	}
 }
