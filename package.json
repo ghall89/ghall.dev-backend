@@ -3,7 +3,7 @@
 	"version": "1.0.0",
 	"description": "",
 	"scripts": {
-		"build": "tsc",
+		"build": "bun build ./src/app.ts --outdir ./dist --target bun",
 		"start": "node dist/app.js",
 		"dev": "bun run --hot src/app.ts",
 		"lint": "eslint 'src/**/*.ts'"
