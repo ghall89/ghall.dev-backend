@@ -1,5 +1,7 @@
 import nodemailer, { type Transporter } from 'nodemailer';
 
+import { EmailMessage } from '../types';
+
 export default class EmailService {
 	contactEmail: string | undefined;
 	transporter: Transporter;
@@ -22,17 +24,7 @@ export default class EmailService {
 		});
 	}
 
-	async sendEmail({
-		name,
-		subject,
-		email,
-		message,
-	}: {
-		name: string;
-		subject: string;
-		email: string;
-		message: string;
-	}) {
+	async sendEmail({ name, subject, email, message }: EmailMessage) {
 		try {
 			if (!name || !subject || !email || !message) {
 				throw Error('Missing required fields');
