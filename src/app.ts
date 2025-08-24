@@ -1,21 +1,26 @@
 import { Hono } from 'hono';
 import { cors } from 'hono/cors';
+import { rateLimiter } from 'hono-rate-limiter';
 
 import dotenv from 'dotenv';
 
-import EmailService from './services/email-service';
-import { EmailMessage } from './types';
+import sendEmail from './utils/send-email';
 
 dotenv.config();
 
 const app = new Hono();
 const PORT = process.env.PORT || 3000;
 
-const emailService = new EmailService();
-
 app.use(
 	cors({
 		origin: process.env.NODE_ENV === 'production' ? ['https://ghall.dev'] : '*',
+	})
+);
+app.use(
+	rateLimiter({
+		windowMs: 10 * 60 * 1000, // 10 minutes
+		limit: 5,
+		keyGenerator: (c) => c,
 	})
 );
 
@@ -23,9 +28,7 @@ app.post('/contact', async (c) => {
 	try {
 		const body = await c.req.json();
 
-		console.log('Received email:', body);
-
-		await emailService.sendEmail(body);
+		await sendEmail(body);
 		return c.json({ success: true });
 	} catch (error) {
 		console.error(error);

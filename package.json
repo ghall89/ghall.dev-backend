@@ -15,7 +15,10 @@
 		"body-parser": "^2.2.0",
 		"dotenv": "^17.2.1",
 		"hono": "^4.9.4",
-		"nodemailer": "^7.0.5"
+		"hono-rate-limiter": "^0.4.2",
+		"nodemailer": "^7.0.5",
+		"sanitize-html": "^2.17.0",
+		"zod": "^4.1.0"
 	},
 	"devDependencies": {
 		"@flydotio/dockerfile": "^0.7.10",
@@ -24,6 +27,7 @@
 		"@types/express": "^5.0.3",
 		"@types/node": "^24.0.3",
 		"@types/nodemailer": "^6.4.17",
+		"@types/sanitize-html": "^2.16.0",
 		"@typescript-eslint/parser": "^8.34.1",
 		"eslint-unicorn": "^55.0.0",
 		"nodemon": "^3.1.10",
