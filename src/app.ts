@@ -4,7 +4,7 @@ import { rateLimiter } from 'hono-rate-limiter';
 
 import dotenv from 'dotenv';
 
-import sendEmail from './utils/send-email';
+import sendEmail from './lib/send-email';
 
 dotenv.config();
 
@@ -18,9 +18,13 @@ app.use(
 );
 app.use(
 	rateLimiter({
-		windowMs: 10 * 60 * 1000, // 10 minutes
-		limit: 5,
-		keyGenerator: (c) => c,
+		windowMs: 30 * 60 * 1000, // 30 minutes
+		limit: 3,
+		keyGenerator: (c) => {
+			const xfwd = c.req.header('x-forwarded-for');
+			const ip = xfwd?.split(',')[0]?.trim() ?? '';
+			return ip;
+		},
 	})
 );
 
