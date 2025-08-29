@@ -1,48 +1,45 @@
-import express, { type Request, type Response } from 'express';
-import rateLimit from 'express-rate-limit';
+import { Hono } from 'hono';
+import { cors } from 'hono/cors';
+import { rateLimiter } from 'hono-rate-limiter';
+
 import dotenv from 'dotenv';
 
-import EmailService from './services/email-service';
-import cors from 'cors';
+import sendEmail from './lib/send-email';
 
 dotenv.config();
 
-const app = express();
+const app = new Hono();
 const PORT = process.env.PORT || 3000;
 
-const emailService = new EmailService();
-
-// limit IP to 3 requests every 15 min
-const limiter = rateLimit({
-	windowMs: 15 * 60 * 1000,
-	max: 3,
-});
-
-app.use(express.json());
 app.use(
 	cors({
 		origin: process.env.NODE_ENV === 'production' ? ['https://ghall.dev'] : '*',
-		optionsSuccessStatus: 200,
 	})
 );
-app.use(limiter);
+app.use(
+	rateLimiter({
+		windowMs: 30 * 60 * 1000, // 30 minutes
+		limit: 3,
+		keyGenerator: (c) => {
+			const xfwd = c.req.header('x-forwarded-for');
+			const ip = xfwd?.split(',')[0]?.trim() ?? '';
+			return ip;
+		},
+	})
+);
 
-app.post('/contact', async (req: Request, res: Response) => {
+app.post('/contact', async (c) => {
 	try {
-		const { body } = req;
+		const body = await c.req.json();
 
-		await emailService.sendEmail(body);
-		res.status(200).json({ success: true });
+		await sendEmail(body);
+		return c.json({ success: true });
 	} catch (error) {
 		console.error(error);
-		res.status(500).json({ error: 'Failed to send email' });
+		return c.json({ error: 'Failed to send email' }, 500);
 	}
 });
 
-app.get('/health', (_req: Request, res: Response) => {
-	res.status(200).json({ status: 'OK' });
-});
+app.get('/health', (c) => c.json({ status: 'OK' }));
 
-app.listen(PORT, () => {
-	console.log(`Server is running on port ${PORT}`);
-});
+export default app;
