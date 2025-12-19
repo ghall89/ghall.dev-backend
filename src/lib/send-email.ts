@@ -1,4 +1,4 @@
-import nodemailer, { type Transporter } from 'nodemailer';
+import { Resend, type CreateEmailOptions } from 'resend';
 import * as z from 'zod';
 import sanitizeHtml from 'sanitize-html';
 
@@ -12,34 +12,30 @@ const EmailMessage = z.object({
 type EmailMessageType = z.infer<typeof EmailMessage>;
 
 export default async function sendEmail(body: EmailMessageType) {
-	const contactEmail = process.env.CONTACT_EMAIL;
+	const { CONTACT_EMAIL, RESEND_API_KEY } = process.env;
 
-	if (!contactEmail) {
+	if (!CONTACT_EMAIL) {
 		throw Error('No contact email...');
 	}
 
-	const transporter = nodemailer.createTransport({
-		host: process.env.SMTP_HOST ?? '',
-		port: 465,
-		secure: true,
-		auth: {
-			user: process.env.SMTP_USER,
-			pass: process.env.SMTP_PASS,
-		},
-	});
+	if (!CONTACT_EMAIL) {
+		throw Error('No Resend API key...');
+	}
+
+	const resend = new Resend(RESEND_API_KEY);
 
 	try {
 		const validatedBody = EmailMessage.parse(body);
 
-		const mailOptions = {
-			from: `${validatedBody.name} <${validatedBody.email}>`,
-			to: contactEmail,
+		const mailOptions: CreateEmailOptions = {
+			from: `${validatedBody.name} <${CONTACT_EMAIL}>`,
+			to: CONTACT_EMAIL,
 			replyTo: validatedBody.email,
 			subject: validatedBody.subject,
 			text: validatedBody.message,
 		};
 
-		return transporter.sendMail(mailOptions);
+		return resend.emails.send(mailOptions);
 	} catch (error) {
 		throw Error('Error sending email: ' + error);
 	}
