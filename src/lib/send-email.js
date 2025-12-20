@@ -1,4 +1,4 @@
-import { Resend, type CreateEmailOptions } from 'resend';
+import { Resend } from 'resend';
 import * as z from 'zod';
 import sanitizeHtml from 'sanitize-html';
 
@@ -9,16 +9,23 @@ const EmailMessage = z.object({
 	message: z.string().transform((str) => sanitizeHtml(str)),
 });
 
-type EmailMessageType = z.infer<typeof EmailMessage>;
+/**
+ * @typedef {z.infer<typeof EmailMessage>} EmailMessageType
+ */
 
-export default async function sendEmail(body: EmailMessageType) {
+/**
+ * Send email with Resend.
+ * @param {EmailMessageType} body Email message body
+ * @returns {Promise<unknown>} Promise with a response from the Resend API
+ */
+export default async function sendEmail(body) {
 	const { CONTACT_EMAIL, RESEND_API_KEY } = process.env;
 
 	if (!CONTACT_EMAIL) {
 		throw Error('No contact email...');
 	}
 
-	if (!CONTACT_EMAIL) {
+	if (!RESEND_API_KEY) {
 		throw Error('No Resend API key...');
 	}
 
@@ -27,7 +34,7 @@ export default async function sendEmail(body: EmailMessageType) {
 	try {
 		const validatedBody = EmailMessage.parse(body);
 
-		const mailOptions: CreateEmailOptions = {
+		const mailOptions = {
 			from: `${validatedBody.name} <${CONTACT_EMAIL}>`,
 			to: CONTACT_EMAIL,
 			replyTo: validatedBody.email,

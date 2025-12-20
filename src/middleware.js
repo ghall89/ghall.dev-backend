@@ -2,7 +2,11 @@ import { Hono } from 'hono';
 import { cors } from 'hono/cors';
 import { rateLimiter } from 'hono-rate-limiter';
 
-export function addMiddleware(app: Hono) {
+/**
+ * Initialize cors and rateLimiter middlewares.
+ *  @param {Hono} app Hono app
+ */
+export function addMiddleware(app) {
 	app.use(
 		cors({
 			origin:
@@ -12,7 +16,7 @@ export function addMiddleware(app: Hono) {
 
 	app.use(
 		rateLimiter({
-			windowMs: 30 * 60 * 1000, // 30 minutes
+			windowMs: 1 * 60 * 1000, // 1 minute
 			limit: 3,
 			keyGenerator: (c) => {
 				const xfwd = c.req.header('x-forwarded-for');

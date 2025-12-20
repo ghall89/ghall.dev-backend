@@ -3,10 +3,9 @@
 	"version": "1.0.0",
 	"description": "",
 	"scripts": {
-		"build": "bun build ./src/app.ts --outdir ./dist --target bun",
-		"start": "bun run dist/app.js",
-		"dev": "bun run --hot src/app.ts",
-		"lint": "eslint 'src/**/*.ts'"
+		"start": "bun run src/app.js",
+		"dev": "bun run --hot src/app.js",
+		"lint": "eslint 'src/**/*.js'"
 	},
 	"keywords": [],
 	"author": "",
@@ -14,6 +13,7 @@
 	"dependencies": {
 		"body-parser": "^2.2.0",
 		"dotenv": "^17.2.1",
+		"eslint": "^9.39.2",
 		"hono": "^4.9.11",
 		"hono-rate-limiter": "^0.4.2",
 		"resend": "^6.6.0",
@@ -26,13 +26,12 @@
 		"@types/cors": "^2.8.19",
 		"@types/express": "^5.0.3",
 		"@types/node": "^24.0.3",
-		"@types/nodemailer": "^6.4.20",
 		"@types/sanitize-html": "^2.16.0",
 		"@typescript-eslint/parser": "^8.34.1",
+		"eslint-plugin-jsdoc": "^61.5.0",
+		"eslint-plugin-unicorn": "^62.0.0",
 		"eslint-unicorn": "^55.0.0",
 		"nodemon": "^3.1.10",
-		"prettier": "^3.5.3",
-		"ts-node": "^10.9.2",
-		"typescript": "^5.8.3"
+		"prettier": "^3.5.3"
 	}
 }

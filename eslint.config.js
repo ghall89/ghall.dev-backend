@@ -1,17 +1,16 @@
-import eslintPluginUnicorn from 'eslint-plugin-unicorn';
 import globals from 'globals';
+import { jsdoc } from 'eslint-plugin-jsdoc';
 
 export default [
+	jsdoc({
+		config: 'flat/recommended',
+	}),
 	{
 		languageOptions: {
 			globals: globals.builtin,
 		},
-		plugins: {
-			unicorn: eslintPluginUnicorn,
-		},
+
 		rules: {
-			'unicorn/better-regex': 'error',
-			'unicorn/…': 'error',
 			'max-len': [
 				'warn',
 				{

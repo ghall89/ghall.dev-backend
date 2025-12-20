@@ -27,19 +27,9 @@ RUN bun install
 # Copy application code
 COPY . .
 
-# Build application
-RUN bun --bun run build
-
 # Remove development dependencies
 RUN rm -rf node_modules && \
     bun install --ci
-
-
-# Final stage for app image
-FROM base
-
-# Copy built application
-COPY --from=build /app /app
 
 # Start the server by default, this can be overwritten at runtime
 EXPOSE 3000

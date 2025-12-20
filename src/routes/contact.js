@@ -11,7 +11,6 @@ contactRouter.post('/contact', async (c) => {
 		await sendEmail(body);
 		return c.json({ success: true });
 	} catch (error) {
-		console.error(error);
 		return c.json({ error: 'Failed to send email' }, 500);
 	}
 });
